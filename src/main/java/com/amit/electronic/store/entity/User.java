@@ -2,6 +2,10 @@ package com.amit.electronic.store.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
 
 @Getter
@@ -31,4 +35,3 @@ public class User {
     private String userDescription;
 
 }
-
