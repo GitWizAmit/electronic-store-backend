@@ -1,6 +1,7 @@
 package com.amit.electronic.store.service;
 
 import com.amit.electronic.store.entity.User;
+import com.amit.electronic.store.model.GetUserRequest;
 import com.amit.electronic.store.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ class UserServiceImplTest {
     void testDeleteUser() {
         User user = new User();
         user.setId(1L);
-        user.setUserEmail("amit@gmail.com");
+        user.setEmail("amit@gmail.com");
 
         doNothing().when(userRepository).delete(user);
         userServiceImpl.deleteUser(user);
@@ -75,59 +76,83 @@ class UserServiceImplTest {
     void testUpdateUserForExistingUser() {
         User user = new User();
         user.setId(1L);
-        user.setUserEmail("amit@gmail.com");
-        user.setUserDescription("Software Engineer");
-        user.setUserGender("Male");
-        user.setUserName("Amit");
-        user.setUserPassword("password");
+        user.setEmail("amit@gmail.com");
+        user.setDescription("Software Engineer");
+        user.setGender("Male");
+        user.setName("Amit");
+        user.setPassword("password");
 
         User updatedUser = new User();
         updatedUser.setId(1L);
 
         when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(updatedUser));
         when(userRepository.save(user)).thenReturn(user);
-        assertEquals(user.getId(), userServiceImpl.updateUser(user).getId());
+
+        User updatedUserResponse = userServiceImpl.updateUser(user);
+
+        assertEquals(user.getId(), updatedUserResponse.getId());
+        assertEquals(user.getEmail(), updatedUserResponse.getEmail());
+        assertEquals(user.getDescription(), updatedUserResponse.getDescription());
+        assertEquals(user.getGender(), updatedUserResponse.getGender());
+        assertEquals(user.getName(), updatedUserResponse.getName());
+        assertEquals(user.getPassword(), updatedUserResponse.getPassword());
     }
 
     @Test
     void testSetUserEmail() {
         User user = new User();
         user.setId(1L);
-        user.setUserEmail("xyz@gmail.com");
+        user.setEmail("xyz@gmail.com");
 
         when(userRepository.save(user)).thenReturn(user);
-        assertEquals("test123@gmail.com", userServiceImpl.setUserEmail(user, "test123@gmail.com").getUserEmail());
+        assertEquals("test123@gmail.com", userServiceImpl.setUserEmail(user, "test123@gmail.com").getEmail());
     }
 
     @Test
-    void testGetUserByEmailForExisting() {
+    void testGetUserBasedOnTheRequestWithId() {
         User user = new User();
         user.setId(1L);
-        user.setUserEmail("amit123@gmail.com");
 
-        when(userRepository.findByUserEmail(anyString())).thenReturn(java.util.Optional.of(user));
-        assertEquals(user.getId(), userServiceImpl.getUserByEmail("amit123@gmail.com").getId());
+        GetUserRequest getUserRequest = new GetUserRequest();
+        getUserRequest.setId(1L);
+
+        when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(user));
+        assertEquals(user.getId(), userServiceImpl.getUserBasedOnTheUserRequest(getUserRequest).getId());
     }
 
     @Test
-    void testGetUserByEmailForNonExisting() {
-        when(userRepository.findByUserEmail(anyString())).thenReturn(java.util.Optional.empty());
-        assertNull(userServiceImpl.getUserByEmail("testForNull"));
-    }
-
-    @Test
-    void testGetUserByNameAndEmailForExisting() {
+    void testGetUserBasedOnTheRequestWithEmail() {
         User user = new User();
         user.setId(1L);
-        user.setUserEmail("amit132@gmail.com");
+        user.setEmail("test@gmail.com");
 
-        when(userRepository.findByUserNameAndUserEmail(anyString(), anyString())).thenReturn(java.util.Optional.of(user));
-        assertEquals(user.getId(), userServiceImpl.getUserByNameAndEmail("Amit", "amit132@gmail.com").getId());
+        GetUserRequest getUserRequest = new GetUserRequest();
+        getUserRequest.setEmail("test@gmail.com");
+
+        when(userRepository.findByEmail(any())).thenReturn(java.util.Optional.of(user));
+
+        assertEquals(user.getId(), userServiceImpl.getUserBasedOnTheUserRequest(getUserRequest).getId());
     }
 
     @Test
-    void testGetUserByNameAndEmailForNonExisting() {
-        when(userRepository.findByUserNameAndUserEmail(anyString(), anyString())).thenReturn(java.util.Optional.empty());
-        assertNull(userServiceImpl.getUserByNameAndEmail("testForNull", "testForNull"));
+    void testGetUserBasedOnTheRequestWithNameAndEmail() {
+        User user = new User();
+        user.setId(1L);
+        user.setEmail("test@gmail.com");
+        user.setName("Amit");
+
+        GetUserRequest getUserRequest = new GetUserRequest();
+        getUserRequest.setEmail("test@gmail.com");
+        getUserRequest.setName("Amit");
+
+        when(userRepository.findByNameAndEmail(anyString(), anyString())).thenReturn(java.util.Optional.of(user));
+
+        assertEquals(user.getId(), userServiceImpl.getUserBasedOnTheUserRequest(getUserRequest).getId());
+    }
+
+    @Test
+    void testGetUserBasedOnTheRequestWithNull() {
+        User user = userServiceImpl.getUserBasedOnTheUserRequest(new GetUserRequest());
+        assertNull(user);
     }
 }

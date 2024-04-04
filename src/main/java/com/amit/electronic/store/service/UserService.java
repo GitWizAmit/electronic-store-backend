@@ -10,8 +10,6 @@ public interface UserService {
     User create(User user);
     // get user by userId
     User getUserById(Long id);
-    // get user by userEmail
-    User getUserByEmail(String email);
     // get all users
     List<User> getAllUsers();
     // set user email
@@ -20,7 +18,5 @@ public interface UserService {
     User updateUser(User user);
     // delete user
     void deleteUser(User user);
-    // get user by name and email
-    User getUserByNameAndEmail(String name, String email);
 }
 

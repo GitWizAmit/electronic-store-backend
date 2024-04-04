@@ -1,6 +1,7 @@
 package com.amit.electronic.store.controller;
 
 import com.amit.electronic.store.entity.User;
+import com.amit.electronic.store.model.GetUserRequest;
 import com.amit.electronic.store.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,22 +29,16 @@ public class UserController {
         return userServiceImpl.create(user);
     }
 
-    // get single user by id endpoint
-    @GetMapping("/get/user/id/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userServiceImpl.getUserById(id);
+    // get single user endpoint
+    @GetMapping("/get_user")
+    public User getUser(@RequestBody GetUserRequest request) {
+        return userServiceImpl.getUserBasedOnTheUserRequest(request);
     }
 
     // get all users endpoint
-    @GetMapping("/getAll/users")
+    @GetMapping("/get_users")
     public List<User> getAllUsers() {
         return userServiceImpl.getAllUsers();
-    }
-
-    // get single user by email endpoint
-    @GetMapping("/get/user/email/{email}")
-    public User getUserByEmail(@PathVariable String email) {
-        return userServiceImpl.getUserByEmail(email);
     }
 
     // update user endpoint
@@ -62,12 +57,6 @@ public class UserController {
     @DeleteMapping("/delete/user/{id}")
     public void deleteUser(@PathVariable Long id) {
         userServiceImpl.deleteUser(userServiceImpl.getUserById(id));
-    }
-
-    // get user by name and email endpoint
-    @GetMapping("/get/user/{name}/{email}")
-    public User getUserByNameAndEmail(@PathVariable String name, @PathVariable String email) {
-        return userServiceImpl.getUserByNameAndEmail(name, email);
     }
 
 }

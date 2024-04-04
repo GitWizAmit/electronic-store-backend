@@ -24,14 +24,14 @@ public class User {
     @JsonInclude
     private Long id;
     @Column(name = "user_name", length = 50)
-    private String userName;
+    private String name;
     @Column(name = "user_email", unique = true, length = 100)
-    private String userEmail;
+    private String email;
     @Column(name = "user_gender", length = 10)
-    private String userGender;
+    private String gender;
     @Column(name = "user_password", length = 100)
-    private String userPassword;
+    private String password;
     @Column(name = "user_description", length = 1000)
-    private String userDescription;
+    private String description;
 
 }

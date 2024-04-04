@@ -10,11 +10,11 @@ class UserTest {
     void testUser() {
         User user = new User();
         user.setId(1L);
-        user.setUserEmail("amit@gmail.com");
-        user.setUserPassword("password");
-        user.setUserName("Amit");
-        user.setUserGender("Male");
-        user.setUserDescription("Software Engineer");
+        user.setEmail("amit@gmail.com");
+        user.setPassword("password");
+        user.setName("Amit");
+        user.setGender("Male");
+        user.setDescription("Software Engineer");
 
         assertEquals(1L, user.getId());
     }
@@ -32,19 +32,19 @@ class UserTest {
         User user = new User(1L, "test", "test@gmail.com",
                 "Male", "password", "Software Engineer");
 
-        assertEquals("User(id=1, userName=test, userEmail=test@gmail.com, userGender=Male, " +
-                "userPassword=password, userDescription=Software Engineer)", user.toString());
+        assertEquals("User(id=1, name=test, email=test@gmail.com, gender=Male, " +
+                "password=password, description=Software Engineer)", user.toString());
     }
 
     @Test
     void testBuilder() {
         User user = User.builder()
                 .id(1L)
-                .userName("test")
-                .userEmail("test@gmail.com")
-                .userPassword("password")
-                .userGender("male")
-                .userDescription("Software Engineer")
+                .name("test")
+                .email("test@gmail.com")
+                .password("password")
+                .gender("male")
+                .description("Software Engineer")
                 .build();
 
         assertEquals(1L, user.getId());

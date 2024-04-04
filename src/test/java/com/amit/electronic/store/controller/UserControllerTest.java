@@ -1,6 +1,7 @@
 package com.amit.electronic.store.controller;
 
 import com.amit.electronic.store.entity.User;
+import com.amit.electronic.store.model.GetUserRequest;
 import com.amit.electronic.store.service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -53,13 +55,53 @@ class UserControllerTest {
     }
 
     @Test
-    void testGetUserById() throws Exception {
-        User user = new User(); // Create a user object for testing
-        when(userService.getUserById(1L)).thenReturn(user);
+    void getUserById() {
+        User user = new User();
+        user.setId(1L);
 
-        mockMvc.perform(get("/store/get/user/id/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userEmail").doesNotExist()); // Check if the user email is not present in the response
+        GetUserRequest request = new GetUserRequest();
+        request.setId(1L);
+
+        when(userService.getUserBasedOnTheUserRequest(request)).thenReturn(user);
+
+        User foundUser = userController.getUser(request);
+
+        assertEquals(user.getId(), foundUser.getId());
+    }
+
+    @Test
+    void getUserByEmail() {
+        User user = new User();
+        user.setId(1L);
+        user.setEmail("test@gmail.com");
+
+        GetUserRequest request = new GetUserRequest();
+        request.setEmail("test@gmail.com");
+
+        when(userService.getUserBasedOnTheUserRequest(request)).thenReturn(user);
+
+        User foundUser = userController.getUser(request);
+
+        assertEquals(user.getEmail(), foundUser.getEmail());
+    }
+
+    @Test
+    void getUserByNameAndEmail() {
+        User user = new User();
+        user.setId(1L);
+        user.setEmail("123@gmail.com");
+        user.setName("test");
+
+        GetUserRequest request = new GetUserRequest();
+        request.setEmail("123@gmail.com");
+        request.setName("test");
+
+        when(userService.getUserBasedOnTheUserRequest(request)).thenReturn(user);
+
+        User foundUser = userController.getUser(request);
+
+        assertEquals(user.getEmail(), foundUser.getEmail());
+        assertEquals(user.getName(), foundUser.getName());
     }
 
     @Test
@@ -67,19 +109,9 @@ class UserControllerTest {
         User user = new User(); // Create a user object for testing
         when(userService.getAllUsers()).thenReturn(Collections.singletonList(user));
 
-        mockMvc.perform(get("/store/getAll/users"))
+        mockMvc.perform(get("/store/get_users"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].userEmail").doesNotExist()); // Check if the user email is not present in the response
-    }
-
-    @Test
-    void testGetUserByEmail() throws Exception {
-        User user = new User(); // Create a user object for testing
-        when(userService.getUserByEmail("test@example.com")).thenReturn(user);
-
-        mockMvc.perform(get("/store/get/user/email/test@example.com"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userEmail").doesNotExist()); // Check if the user email is not present in the response
     }
 
     @Test
@@ -112,16 +144,6 @@ class UserControllerTest {
 
         mockMvc.perform(delete("/store/delete/user/1"))
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    void testGetUserByNameAndEmail() throws Exception {
-        User user = new User(); // Create a user object for testing
-        when(userService.getUserByNameAndEmail("John", "test@example.com")).thenReturn(user);
-
-        mockMvc.perform(get("/store/get/user/John/test@example.com"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userEmail").doesNotExist()); // Check if the user email is not present in the response
     }
 
 }
