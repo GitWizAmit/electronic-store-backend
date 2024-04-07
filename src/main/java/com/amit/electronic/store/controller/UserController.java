@@ -2,6 +2,7 @@ package com.amit.electronic.store.controller;
 
 import com.amit.electronic.store.entity.User;
 import com.amit.electronic.store.model.GetUserRequest;
+import com.amit.electronic.store.model.UpdateUserRequest;
 import com.amit.electronic.store.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,39 +25,33 @@ public class UserController {
     }
 
     // create user endpoint
-    @PostMapping("/create")
+    @PostMapping("/user")
     public User createUser(@RequestBody User user) {
         return userServiceImpl.create(user);
     }
 
-    // get single user endpoint
-    @GetMapping("/get_user")
+    // get user endpoint
+    @GetMapping("/user")
     public User getUser(@RequestBody GetUserRequest request) {
         return userServiceImpl.getUserBasedOnTheUserRequest(request);
     }
 
     // get all users endpoint
-    @GetMapping("/get_users")
+    @GetMapping("/users")
     public List<User> getAllUsers() {
         return userServiceImpl.getAllUsers();
     }
 
     // update user endpoint
-    @PostMapping("/user/update")
-    public User updateUser(@RequestBody User user) {
-        return userServiceImpl.updateUser(user);
-    }
-
-    // set user email endpoint
-    @PostMapping("/user/set/email/{email}")
-    public User setUserEmail(@RequestBody User user, @PathVariable String email) {
-        return userServiceImpl.setUserEmail(user, email);
+    @PostMapping("/user/{id}")
+    public User updateUser(@RequestBody UpdateUserRequest updateUserRequest, @PathVariable Long id) {
+        return userServiceImpl.updateUser(updateUserRequest, id);
     }
 
     // delete user endpoint
-    @DeleteMapping("/delete/user/{id}")
+    @DeleteMapping("/user/{id}")
     public void deleteUser(@PathVariable Long id) {
-        userServiceImpl.deleteUser(userServiceImpl.getUserById(id));
+        userServiceImpl.deleteUser(id);
     }
 
 }

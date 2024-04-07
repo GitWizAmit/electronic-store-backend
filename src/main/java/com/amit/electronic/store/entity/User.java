@@ -20,18 +20,18 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "id")
     @JsonInclude
     private Long id;
-    @Column(name = "user_name", length = 50)
+    @Column(name = "name", length = 50)
     private String name;
-    @Column(name = "user_email", unique = true, length = 100)
+    @Column(name = "email", unique = true, length = 100)
     private String email;
-    @Column(name = "user_gender", length = 10)
+    @Column(name = "gender", length = 10)
     private String gender;
-    @Column(name = "user_password", length = 100)
+    @Column(name = "password", length = 100)
     private String password;
-    @Column(name = "user_description", length = 1000)
+    @Column(name = "description", length = 1000)
     private String description;
 
 }

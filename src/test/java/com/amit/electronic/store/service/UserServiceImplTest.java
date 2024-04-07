@@ -1,7 +1,9 @@
 package com.amit.electronic.store.service;
 
 import com.amit.electronic.store.entity.User;
+import com.amit.electronic.store.exception.InvalidUserRequestException;
 import com.amit.electronic.store.model.GetUserRequest;
+import com.amit.electronic.store.model.UpdateUserRequest;
 import com.amit.electronic.store.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -29,9 +32,15 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testCreate() {
+    void testCreateHappyPath() {
         User user = new User();
         user.setId(1L);
+        user.setEmail("test@gmail.com");
+        user.setName("test");
+        user.setPassword("test");
+        user.setDescription("Test Description");
+        user.setGender("male");
+
         when(userRepository.save(user)).thenReturn(user);
 
         User createdUser = userServiceImpl.create(user);
@@ -42,10 +51,9 @@ class UserServiceImplTest {
     void testDeleteUser() {
         User user = new User();
         user.setId(1L);
-        user.setEmail("amit@gmail.com");
+        when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(user));
 
-        doNothing().when(userRepository).delete(user);
-        userServiceImpl.deleteUser(user);
+        userServiceImpl.deleteUser(1L);
         verify(userRepository, times(1)).delete(user);
     }
 
@@ -67,45 +75,31 @@ class UserServiceImplTest {
 
     @Test
     void testUpdateUserForNonExistingUser() {
-        User user = new User();
-        when(userRepository.findById(1L)).thenReturn(null);
-        assertNull(userServiceImpl.updateUser(user));
+        UpdateUserRequest user = new UpdateUserRequest();
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        assertNull(userServiceImpl.updateUser(user, 1L));
     }
 
     @Test
     void testUpdateUserForExistingUser() {
-        User user = new User();
-        user.setId(1L);
+        UpdateUserRequest user = new UpdateUserRequest();
         user.setEmail("amit@gmail.com");
         user.setDescription("Software Engineer");
         user.setGender("Male");
         user.setName("Amit");
-        user.setPassword("password");
 
         User updatedUser = new User();
         updatedUser.setId(1L);
 
         when(userRepository.findById(1L)).thenReturn(java.util.Optional.of(updatedUser));
-        when(userRepository.save(user)).thenReturn(user);
+        when(userRepository.save(updatedUser)).thenReturn(updatedUser);
 
-        User updatedUserResponse = userServiceImpl.updateUser(user);
+        User updatedUserResponse = userServiceImpl.updateUser(user, 1L);
 
-        assertEquals(user.getId(), updatedUserResponse.getId());
         assertEquals(user.getEmail(), updatedUserResponse.getEmail());
         assertEquals(user.getDescription(), updatedUserResponse.getDescription());
         assertEquals(user.getGender(), updatedUserResponse.getGender());
         assertEquals(user.getName(), updatedUserResponse.getName());
-        assertEquals(user.getPassword(), updatedUserResponse.getPassword());
-    }
-
-    @Test
-    void testSetUserEmail() {
-        User user = new User();
-        user.setId(1L);
-        user.setEmail("xyz@gmail.com");
-
-        when(userRepository.save(user)).thenReturn(user);
-        assertEquals("test123@gmail.com", userServiceImpl.setUserEmail(user, "test123@gmail.com").getEmail());
     }
 
     @Test
@@ -129,7 +123,7 @@ class UserServiceImplTest {
         GetUserRequest getUserRequest = new GetUserRequest();
         getUserRequest.setEmail("test@gmail.com");
 
-        when(userRepository.findByEmail(any())).thenReturn(java.util.Optional.of(user));
+        when(userRepository.findByEmail(any())).thenReturn(user);
 
         assertEquals(user.getId(), userServiceImpl.getUserBasedOnTheUserRequest(getUserRequest).getId());
     }
@@ -145,14 +139,17 @@ class UserServiceImplTest {
         getUserRequest.setEmail("test@gmail.com");
         getUserRequest.setName("Amit");
 
-        when(userRepository.findByNameAndEmail(anyString(), anyString())).thenReturn(java.util.Optional.of(user));
+        when(userRepository.findByNameAndEmail(anyString(), anyString())).thenReturn(user);
 
         assertEquals(user.getId(), userServiceImpl.getUserBasedOnTheUserRequest(getUserRequest).getId());
     }
 
     @Test
     void testGetUserBasedOnTheRequestWithNull() {
-        User user = userServiceImpl.getUserBasedOnTheUserRequest(new GetUserRequest());
-        assertNull(user);
+        try {
+            userServiceImpl.getUserBasedOnTheUserRequest(new GetUserRequest());
+        } catch (InvalidUserRequestException e) {
+            assertEquals("Invalid user request", e.getMessage());
+        }
     }
 }

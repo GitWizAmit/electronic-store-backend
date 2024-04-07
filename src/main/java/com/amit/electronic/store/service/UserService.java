@@ -1,6 +1,7 @@
 package com.amit.electronic.store.service;
 
 import com.amit.electronic.store.entity.User;
+import com.amit.electronic.store.model.UpdateUserRequest;
 
 import java.util.List;
 
@@ -12,11 +13,9 @@ public interface UserService {
     User getUserById(Long id);
     // get all users
     List<User> getAllUsers();
-    // set user email
-    User setUserEmail(User user, String email);
     // update user
-    User updateUser(User user);
+    User updateUser(UpdateUserRequest updateUserRequest, Long id);
     // delete user
-    void deleteUser(User user);
+    void deleteUser(Long id);
 }
 

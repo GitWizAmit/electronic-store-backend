@@ -1,15 +1,17 @@
 package com.amit.electronic.store.service;
 
 import com.amit.electronic.store.entity.User;
+import com.amit.electronic.store.exception.InvalidUserRequestException;
 import com.amit.electronic.store.model.GetUserRequest;
+import com.amit.electronic.store.model.UpdateUserRequest;
 import com.amit.electronic.store.repository.UserRepository;
+import com.google.common.base.Preconditions;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -17,12 +19,25 @@ import java.util.Optional;
 @Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private static final String USER_NOT_FOUND = "User not found";
 
     public User create(User user) {
+        Preconditions.checkNotNull(user, "User cannot be null");
+        Preconditions.checkNotNull(user.getName(), "User name cannot be null");
+        Preconditions.checkNotNull(user.getEmail(), "User email cannot be null");
+        Preconditions.checkNotNull(user.getPassword(), "User password cannot be null");
+        Preconditions.checkNotNull(user.getGender(), "User gender cannot be null");
+        Preconditions.checkNotNull(user.getDescription(), "User description cannot be null");
+
         return userRepository.save(user);
     }
 
-    public void deleteUser(User user) {
+    public void deleteUser(Long id) {
+        Preconditions.checkNotNull(id, "User id cannot be null");
+
+        User user = userRepository.findById(id).orElse(null);
+        Preconditions.checkNotNull(user, USER_NOT_FOUND);
+
         userRepository.delete(user);
     }
 
@@ -30,40 +45,43 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll();
     }
 
-    public User setUserEmail(User user, String email) {
-        user.setEmail(email);
-        return userRepository.save(user);
-    }
-
-    public User updateUser(User user) {
-        User updatedUser = userRepository.findById(user.getId()).orElse(null);
+    public User updateUser(UpdateUserRequest updateUserRequest, Long id) {
+        User updatedUser = userRepository.findById(id).orElse(null);
         if (updatedUser != null) {
-            updatedUser.setName(user.getName());
-            updatedUser.setEmail(user.getEmail());
-            updatedUser.setPassword(user.getPassword());
-            updatedUser.setGender(user.getGender());
-            updatedUser.setDescription(user.getDescription());
+            updatedUser.setName(updateUserRequest.getName());
+            updatedUser.setEmail(updateUserRequest.getEmail());
+            updatedUser.setGender(updateUserRequest.getGender());
+            updatedUser.setDescription(updateUserRequest.getDescription());
             userRepository.save(updatedUser);
         }
         return updatedUser;
     }
 
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElse(null);
+        Preconditions.checkNotNull(id, "User id cannot be null");
+
+        User user = userRepository.findById(id).orElse(null);
+        Preconditions.checkNotNull(user, USER_NOT_FOUND);
+
+        return user;
     }
 
     public User getUserBasedOnTheUserRequest(GetUserRequest getUserRequest) {
+        Preconditions.checkNotNull(getUserRequest, "GetUserRequest cannot be null");
         if (getUserRequest.getId() != null) {
-            return userRepository.findById(getUserRequest.getId()).orElse(null);
+            User user = userRepository.findById(getUserRequest.getId()).orElse(null);
+            Preconditions.checkNotNull(user, USER_NOT_FOUND);
+            return user;
         } else if (getUserRequest.getName() != null && getUserRequest.getEmail() != null) {
-            Optional<User> user = userRepository.findByNameAndEmail(getUserRequest.getName(), getUserRequest.getEmail());
-            return user.orElse(null);
+            User user = userRepository.findByNameAndEmail(getUserRequest.getName(), getUserRequest.getEmail());
+            Preconditions.checkNotNull(user, USER_NOT_FOUND);
+            return user;
         } else if (getUserRequest.getEmail() != null) {
-            Optional<User> user = userRepository.findByEmail(getUserRequest.getEmail());
-            return user.orElse(null);
-        } else {
-            // Handle invalid or incomplete request
-            return null;
+            User user = userRepository.findByEmail(getUserRequest.getEmail());
+            Preconditions.checkNotNull(user, USER_NOT_FOUND);
+            return user;
         }
+
+        throw  new InvalidUserRequestException("Invalid user request");
     }
 }
