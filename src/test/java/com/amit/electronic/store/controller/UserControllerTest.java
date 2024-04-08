@@ -104,7 +104,6 @@ class UserControllerTest {
     void testUpdateUser() throws Exception {
         UpdateUserRequest request = new UpdateUserRequest();
         request.setName("test");
-        request.setEmail("test@gmail.com");
         request.setDescription("test description");
         request.setGender("male");
 

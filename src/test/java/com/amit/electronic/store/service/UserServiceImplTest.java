@@ -83,7 +83,6 @@ class UserServiceImplTest {
     @Test
     void testUpdateUserForExistingUser() {
         UpdateUserRequest user = new UpdateUserRequest();
-        user.setEmail("amit@gmail.com");
         user.setDescription("Software Engineer");
         user.setGender("Male");
         user.setName("Amit");
@@ -96,7 +95,6 @@ class UserServiceImplTest {
 
         User updatedUserResponse = userServiceImpl.updateUser(user, 1L);
 
-        assertEquals(user.getEmail(), updatedUserResponse.getEmail());
         assertEquals(user.getDescription(), updatedUserResponse.getDescription());
         assertEquals(user.getGender(), updatedUserResponse.getGender());
         assertEquals(user.getName(), updatedUserResponse.getName());
