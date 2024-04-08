@@ -1,5 +1,7 @@
 package com.amit.electronic.store.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -9,6 +11,7 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
 @AllArgsConstructor
 @ToString
 @Entity
@@ -16,17 +19,19 @@ import lombok.*;
 public class User {
 
     @Id
-    @Column(name = "user_id")
-    public String id;
-    @Column(name = "user_name", length = 10)
-    public String name;
-    @Column(name = "user_email", unique = true, length = 15)
-    public String email;
-    @Column(name = "user_gender")
-    public String gender;
-    @Column(name = "user_password", length = 12)
-    public String password;
-    @Column(name = "user_description", length = 1000)
-    public String about;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    @JsonInclude
+    private Long id;
+    @Column(name = "name", length = 50)
+    private String name;
+    @Column(name = "email", unique = true, length = 100)
+    private String email;
+    @Column(name = "gender", length = 10)
+    private String gender;
+    @Column(name = "password", length = 100)
+    private String password;
+    @Column(name = "description", length = 1000)
+    private String description;
 
 }
